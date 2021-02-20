@@ -20,7 +20,7 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-
+	userService.SaveAvatar(1, "images/1-profile.png")
 	//====================================================
 	// Test Service
 	// input := user.LoginInput{
@@ -54,6 +54,7 @@ func main() {
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
+	api.POST("/avatars", userHandler.UploadAvatar)
 
 	router.Run()
 
