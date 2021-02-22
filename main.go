@@ -1,8 +1,10 @@
 package main
 
 import (
+	"backendEkost/auth"
 	"backendEkost/handler"
 	"backendEkost/user"
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +22,10 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-	userService.SaveAvatar(1, "images/1-profile.png")
+	authService := auth.NewService()
+
+	fmt.Println(authService.GenerateToken(1001))
+
 	//====================================================
 	// Test Service
 	// input := user.LoginInput{
@@ -46,7 +51,7 @@ func main() {
 	// 	fmt.Println(userByEmail.Name)
 	// }
 
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1") //API Versioning
