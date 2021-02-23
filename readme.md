@@ -65,3 +65,14 @@ cara memasukan ke git
 2. git add . 
 3. git -m "commit nya"
 4. git remote add origin https://github.com/nocturnalcoders/BackendEkost.git
+
+//Tentang Middleware
+//1. Ambil Nilai Header Autorization 
+//Saat user mengirim req ke endpoint yang membutuhkan autorization
+//:Bearer tokentokentoken
+//2. Dari header authorization, kita ambil nilai token saja
+//3. Kita valdiasi token -> pakai service validate token
+//4. Menentukan valid / tidak valid
+//5. Lalu diambil nilai user_id
+//6. ambil user dari db berdasarkan user_id lewat service -> butuh user service
+//7. Jika User ada , kita set user context(Sebuah tempat untuk simpan nilai untuk di get / diset di tempat lain)

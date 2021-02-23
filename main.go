@@ -3,9 +3,13 @@ package main
 import (
 	"backendEkost/auth"
 	"backendEkost/handler"
+	"backendEkost/helper"
 	"backendEkost/user"
 	"log"
+	"net/http"
+	"strings"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -73,7 +77,10 @@ func main() {
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
-	api.POST("/avatars", userHandler.UploadAvatar)
+	//Perbedaan authMiddleware dengan authMiddleware()
+	//authMiddleware kita mempassing middlewarenya
+	//authMiddleware() brati yang dipassing nilai kembalian dari eksekui authMiddleware
+	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 
 	router.Run()
 
@@ -127,4 +134,76 @@ func main() {
 // 	db.Find(&users)
 
 // 	c.JSON(http.StatusOK, users)
+// }
+
+//Jadi Method Authmiddleware akan mengembalikan sebuah function handler func
+//Handlerfunc adalah func yang parameternya gin context
+func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("Authorization")
+
+		if !strings.Contains(authHeader, "Bearer") {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		tokenString := ""
+		arrayToken := strings.Split(authHeader, " ")
+		if len(arrayToken) == 2 {
+			tokenString = arrayToken[1]
+		}
+
+		token, err := authService.ValidateToken(tokenString)
+		if err != nil {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		//mengambil key yang ada di token
+		claim, ok := token.Claims.(jwt.MapClaims)
+		if !ok || !token.Valid {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		userID := int(claim["user_id"].(float64))
+
+		user, err := userService.GetUserByID(userID)
+		if err != nil {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		c.Set("currentUser", user)
+
+	}
+
+}
+
+//Tidak boleh memakai tambahan parameter untuk gin.context karena nanti sudah bukan sebuah middleware lagi
+// func authMiddleware(c *gin.Context) {
+// 	authHeader := c.GetHeader("Authorization")
+
+// 	if !strings.Contains(authHeader, "Bearer") {
+// 		response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+// 		c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+// 		return
+// 		//Mengapa memakai AbortWithStatusJSON , karena dia adalah sebuah middleware supaya tidak berlanjut ke proses berikutnya , atau dihentikan oleh sistem
+// 	}
+
+// 	//Bearer tokentokentoken -> dipisah oleh spasi
+// 	//Isinya sekarang adalah 2 buah array of strings
+// 	// var tokenString string
+// 	tokenString := ""
+// 	arrayToken := strings.Split(authHeader, " ")
+// 	if len(tokenString) == 2 {
+// 		tokenString = arrayToken[1]
+// 	}
+
+// 	//tahap validasi token
+// 	token, err :=
 // }

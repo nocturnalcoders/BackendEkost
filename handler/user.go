@@ -176,7 +176,9 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 	//tanda %d menggantikan user id , dan %s menggantikan filename
 
 	//harus nya dapat dari JWT, Tapi sabarr
-	userID := 1
+	currentUser := c.MustGet("currentUser").(user.User)
+	userID := currentUser.ID
+
 	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
 
 	err = c.SaveUploadedFile(file, path)
