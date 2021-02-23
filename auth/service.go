@@ -1,7 +1,11 @@
 package auth
 
 //service generate token
-import "github.com/dgrijalva/jwt-go"
+import (
+	"errors"
+
+	"github.com/dgrijalva/jwt-go"
+)
 
 //tentukan dahulu servicenya mau ngapain
 //1. bagaimana cara membuat token (Generate)
@@ -9,6 +13,7 @@ import "github.com/dgrijalva/jwt-go"
 
 type Service interface {
 	GenerateToken(userID int) (string, error)
+	ValidateToken(token string) (*jwt.Token, error)
 }
 
 type jwtService struct {
@@ -38,4 +43,28 @@ func (s *jwtService) GenerateToken(userID int) (string, error) {
 
 	return signedToken, nil
 
+}
+
+func (s *jwtService) ValidateToken(encodedToken string) (*jwt.Token, error) {
+	//perlu di parse dlu tokennya
+	//hal yang dilakukan
+	//1. memasukan token
+	//2. parameter adalah sebuah func dimana dia mengembalikan interace dan error
+	//3. jika method sudah benar dengan algo HS256 dia akan dicek dan mecocokan method
+	//4. kemudian jika benar dia akan mengembalikan secret key
+	//5. supaya encoded token apakah benar di buat dengan secret key
+	//6. jika beda dia tidak akan valid
+	//7. jika token berhasil divalidasi maka akan masuk
+
+	token, err := jwt.Parse(encodedToken, func(token *jwt.Token) (interface{}, error) {
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, errors.New("invalid token")
+		}
+		return []byte(SECRET_KEY), nil
+	})
+	if err != nil {
+		return token, err
+	}
+	return token, nil
 }

@@ -4,7 +4,6 @@ import (
 	"backendEkost/auth"
 	"backendEkost/handler"
 	"backendEkost/user"
-	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -23,8 +22,23 @@ func main() {
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
-
-	fmt.Println(authService.GenerateToken(1001))
+	//Test Validasi Token
+	// // token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2fQ.ErbRHHI-DYqCEwjmRfuBa60a40Slygl7jnXYi0Uq3bg")
+	// // if err != nil {
+	// // 	fmt.Println("EROOR")
+	// // 	fmt.Println("EROOR")
+	// // 	fmt.Println("EROOR")
+	// // }
+	// // if token.Valid {
+	// // 	fmt.Println("VALID")
+	// // 	fmt.Println("VALID")
+	// // 	fmt.Println("VALID")
+	// // } else {
+	// // 	fmt.Println("INVALID")
+	// // 	fmt.Println("INVALID")
+	// // 	fmt.Println("INVALID")
+	// // }
+	// fmt.Println(authService.GenerateToken(1001))
 
 	//====================================================
 	// Test Service
