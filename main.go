@@ -4,7 +4,9 @@ import (
 	"backendEkost/auth"
 	"backendEkost/handler"
 	"backendEkost/helper"
+	"backendEkost/kost"
 	"backendEkost/user"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -24,6 +26,25 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
+	kostRepository := kost.NewRepository(db)
+
+	// kosts, err := kostRepository.FindAll()
+	kosts, err := kostRepository.FindByUserID(1)
+
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println(len(kosts))
+	for _, kost := range kosts {
+		fmt.Println(kost.Name)
+		if len(kost.KostImages) > 0 {
+			fmt.Println("jumlah gambar")
+			fmt.Println(len(kost.KostImages))
+			fmt.Println(kost.KostImages[0].FileName)
+		}
+	}
+
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 	//Test Validasi Token
