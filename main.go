@@ -29,24 +29,29 @@ func main() {
 	kostRepository := kost.NewRepository(db)
 
 	// kosts, err := kostRepository.FindAll()
-	kosts, err := kostRepository.FindByUserID(1)
+	// kosts, err := kostRepository.FindByUserID(1)
 
-	fmt.Println("debug")
-	fmt.Println("debug")
-	fmt.Println("debug")
-	fmt.Println("debug")
-	fmt.Println(len(kosts))
-	for _, kost := range kosts {
-		fmt.Println(kost.Name)
-		if len(kost.KostImages) > 0 {
-			fmt.Println("jumlah gambar")
-			fmt.Println(len(kost.KostImages))
-			fmt.Println(kost.KostImages[0].FileName)
-		}
-	}
+	// fmt.Println("debug")
+	// fmt.Println("debug")
+	// fmt.Println("debug")
+	// fmt.Println("debug")
+	// fmt.Println(len(kosts))
+	// for _, kost := range kosts {
+	// 	fmt.Println(kost.Name)
+	// 	if len(kost.KostImages) > 0 {
+	// 		fmt.Println("jumlah gambar")
+	// 		fmt.Println(len(kost.KostImages))
+	// 		fmt.Println(kost.KostImages[0].FileName)
+	// 	}
+	// }
 
 	userService := user.NewService(userRepository)
+	kostService := kost.NewService(kostRepository)
 	authService := auth.NewService()
+
+	kosts, _ := kostService.FindKosts(2)
+	fmt.Println(len(kosts))
+
 	//Test Validasi Token
 	// // token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2fQ.ErbRHHI-DYqCEwjmRfuBa60a40Slygl7jnXYi0Uq3bg")
 	// // if err != nil {
