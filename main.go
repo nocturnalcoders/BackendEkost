@@ -6,7 +6,6 @@ import (
 	"backendEkost/helper"
 	"backendEkost/kost"
 	"backendEkost/user"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -49,8 +48,10 @@ func main() {
 	kostService := kost.NewService(kostRepository)
 	authService := auth.NewService()
 
-	kosts, _ := kostService.FindKosts(2)
-	fmt.Println(len(kosts))
+	// kosts, _ := kostService.FindKosts(2)
+	// fmt.Println(len(kosts))
+
+	kostHandler := handler.NewKostHandler(kostService)
 
 	//Test Validasi Token
 	// // token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2fQ.ErbRHHI-DYqCEwjmRfuBa60a40Slygl7jnXYi0Uq3bg")
@@ -107,6 +108,7 @@ func main() {
 	//authMiddleware kita mempassing middlewarenya
 	//authMiddleware() brati yang dipassing nilai kembalian dari eksekui authMiddleware
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+	api.GET("/kosts", kostHandler.GetKosts)
 
 	router.Run()
 

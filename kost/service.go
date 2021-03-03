@@ -1,7 +1,7 @@
 package kost
 
 type Service interface {
-	FindKosts(userID int) ([]Kost, error)
+	GetKosts(userID int) ([]Kost, error)
 }
 
 type service struct {
@@ -12,7 +12,7 @@ func NewService(repository Repository) *service {
 	return &service{repository}
 }
 
-func (s *service) FindKosts(userID int) ([]Kost, error) {
+func (s *service) GetKosts(userID int) ([]Kost, error) {
 	//mengapa tidak memakai json karena parameter yang dikirimkan oleh user akan lsg mendapatkan integer
 	//nanti di cek apakah userID ada atau tidak
 	//hanya mengambil userID yang bersangkutan
