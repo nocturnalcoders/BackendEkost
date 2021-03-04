@@ -2,6 +2,7 @@ package kost
 
 type Service interface {
 	GetKosts(userID int) ([]Kost, error)
+	GetKostByID(input GetKostDetailInput) (Kost, error)
 }
 
 type service struct {
@@ -33,4 +34,13 @@ func (s *service) GetKosts(userID int) ([]Kost, error) {
 
 	return kosts, nil
 
+}
+
+func (s *service) GetKostByID(input GetKostDetailInput) (Kost, error) {
+	kost, err := s.repository.FindByID(input.ID)
+	if err != nil {
+		return kost, err
+	}
+
+	return kost, nil
 }

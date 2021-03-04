@@ -42,3 +42,36 @@ func (h *kostHandler) GetKosts(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 
 }
+
+func (h *kostHandler) GetKost(c *gin.Context) {
+	// bentuknya api/v1/kosts/id -> id bisa 1 / 2 / 3 brapapun
+	//Handler -> Mapping id yang di URL ke Struct Input utk dimasukan ke Service , Call formatter
+	//Service -> Inputan Struct untuk menangkap ID di URL , pakai shouldbindJSOn
+	//Repository  -> untuk get kost by id
+
+	var input kost.GetKostDetailInput
+
+	err := c.ShouldBindUri(&input)
+	if err != nil {
+		response := helper.APIResponse("Failed to Get Detail of Kost", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	// kost, err := h.service.GetKostByID(input)
+	// if err != nil {
+	// 	response := helper.APIResponse("Failed to Get Detail of Kost", http.StatusBadRequest, "error", nil)
+	// 	c.JSON(http.StatusBadRequest, response)
+	// 	return
+	// }
+
+	kostDetail, err := h.service.GetKostByID(input)
+	if err != nil {
+		response := helper.APIResponse("Failed to Get Detail of Kost", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Kost Detail", http.StatusOK, "success", kost.FormatKostDetail(kostDetail))
+	c.JSON(http.StatusOK, response)
+}

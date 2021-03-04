@@ -99,7 +99,8 @@ func main() {
 	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
-	api := router.Group("/api/v1") //API Versioning
+	router.Static("/images", "./images") // "./images" -> nama folder , "/images" -> akses folder
+	api := router.Group("/api/v1")       //API Versioning
 
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
@@ -109,6 +110,7 @@ func main() {
 	//authMiddleware() brati yang dipassing nilai kembalian dari eksekui authMiddleware
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 	api.GET("/kosts", kostHandler.GetKosts)
+	api.GET("/kosts/:id", kostHandler.GetKost)
 
 	router.Run()
 

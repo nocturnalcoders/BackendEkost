@@ -1,6 +1,9 @@
 package kost
 
-import "time"
+import (
+	"backendEkost/user"
+	"time"
+)
 
 type Kost struct {
 	ID                int
@@ -16,6 +19,7 @@ type Kost struct {
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 	KostImages        []KostImage
+	User              user.User
 }
 
 type KostImage struct {
