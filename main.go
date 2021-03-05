@@ -48,6 +48,23 @@ func main() {
 	kostService := kost.NewService(kostRepository)
 	authService := auth.NewService()
 
+	// input := kost.CreateKostInput{}
+	// input.Name = "Kost Bu OONG MANTEPPP BEUTT"
+	// input.ShortDescription = "Short amat bos"
+	// input.Description = "LONGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
+	// input.LiverCount = 10
+	// input.Perks = "3 Kamar Bobo, 2 Kamar Mandi dalam, 3 Tv Room Esklusiv"
+
+	// //Mengambil user dari UserService
+	// inputUser, _ := userService.GetUserByID(28)
+
+	// input.User = inputUser
+
+	// _, err = kostService.CreateKost(input)
+	// if err != nil {
+	// 	log.Fatal(err.Error())
+	// }
+
 	// kosts, _ := kostService.FindKosts(2)
 	// fmt.Println(len(kosts))
 
@@ -110,7 +127,11 @@ func main() {
 	//authMiddleware() brati yang dipassing nilai kembalian dari eksekui authMiddleware
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 	api.GET("/kosts", kostHandler.GetKosts)
-	api.GET("/kosts/:id", kostHandler.GetKost)
+	api.POST("/kosts", kostHandler.GetKosts)
+	api.GET("/kosts/:id", authMiddleware(authService, userService), kostHandler.CreateKost)
+
+	//Cara mendapatkan token dengan mengambil dari token
+	//Login email dan password lalu send lewat body dengan POST
 
 	router.Run()
 

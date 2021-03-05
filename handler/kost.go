@@ -3,6 +3,7 @@ package handler
 import (
 	"backendEkost/helper"
 	"backendEkost/kost"
+	"backendEkost/user"
 	"net/http"
 	"strconv"
 
@@ -75,3 +76,38 @@ func (h *kostHandler) GetKost(c *gin.Context) {
 	response := helper.APIResponse("Kost Detail", http.StatusOK, "success", kost.FormatKostDetail(kostDetail))
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *kostHandler) CreateKost(c *gin.Context) {
+	var input kost.CreateKostInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed To Create Kost", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+
+	input.User = currentUser
+
+	newKost, err := h.service.CreateKost(input)
+	if err != nil {
+		response := helper.APIResponse("Failed To Create Kost", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Success To Create Kost", http.StatusOK, "success", kost.FormatKost(newKost))
+	c.JSON(http.StatusOK, response)
+}
+
+//User mengisi form
+//Tangkap parameter dari user ke input struct
+//ambil current user dari JWT/Handler
+//Panggil service, parameter si input struct (dan juga buat slug)
+//panggil repository untuk simpan data kost baru
+//field id user, saat mengirim request handler tau bahwa user x yang membuat

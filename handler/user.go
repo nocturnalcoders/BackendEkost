@@ -176,6 +176,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 	//tanda %d menggantikan user id , dan %s menggantikan filename
 
 	//harus nya dapat dari JWT, Tapi sabarr
+	//Cara mendapatkan data user
 	currentUser := c.MustGet("currentUser").(user.User)
 	userID := currentUser.ID
 

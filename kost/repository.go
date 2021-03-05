@@ -8,6 +8,7 @@ type Repository interface {
 	FindAll() ([]Kost, error)
 	FindByUserID(userID int) ([]Kost, error)
 	FindByID(ID int) (Kost, error)
+	Save(kost Kost) (Kost, error)
 }
 
 type repository struct {
@@ -52,6 +53,15 @@ func (r *repository) FindByID(ID int) (Kost, error) {
 	var kost Kost
 	err := r.db.Preload("User").Preload("KostImages").Where("id = ?", ID).Find(&kost).Error
 
+	if err != nil {
+		return kost, err
+	}
+
+	return kost, nil
+}
+
+func (r *repository) Save(kost Kost) (Kost, error) {
+	err := r.db.Create(&kost).Error
 	if err != nil {
 		return kost, err
 	}
