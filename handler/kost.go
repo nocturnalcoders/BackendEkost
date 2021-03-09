@@ -105,9 +105,54 @@ func (h *kostHandler) CreateKost(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *kostHandler) UpdateKost(c *gin.Context) {
+	var inputID kost.GetKostDetailInput
+
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed to Update Kost", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var inputData kost.CreateKostInput
+
+	err = c.ShouldBindJSON(&inputData)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed To Update Kost", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+
+	inputData.User = currentUser
+
+	updatedKost, err := h.service.UpdateKost(inputID, inputData)
+	if err != nil {
+		response := helper.APIResponse("Failed to Update Kost", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Success To Update Kost", http.StatusOK, "success", kost.FormatKost(updatedKost))
+	c.JSON(http.StatusOK, response)
+}
+
 //User mengisi form
 //Tangkap parameter dari user ke input struct
 //ambil current user dari JWT/Handler
 //Panggil service, parameter si input struct (dan juga buat slug)
 //panggil repository untuk simpan data kost baru
 //field id user, saat mengirim request handler tau bahwa user x yang membuat
+
+//Update Kost
+//1. Repository update data kost
+//2. Service perlu parameter (Find Kost by ID, tangkap parameter, nilainya kita kasih ke struct kost )
+//3. input dari user yang ada di URI (dipassing ke service layer)
+//4. Mapping dari input ke input struct (Ada 2 1. dari user, dan 1 dari uri)
+//5. Handler
+//6. User masukan input

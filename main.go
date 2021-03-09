@@ -127,8 +127,9 @@ func main() {
 	//authMiddleware() brati yang dipassing nilai kembalian dari eksekui authMiddleware
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 	api.GET("/kosts", kostHandler.GetKosts)
-	api.POST("/kosts", kostHandler.GetKosts)
 	api.GET("/kosts/:id", authMiddleware(authService, userService), kostHandler.CreateKost)
+	api.POST("/kosts", kostHandler.GetKosts)
+	api.PUT("/kosts/:id", authMiddleware(authService, userService), kostHandler.UpdateKost)
 
 	//Cara mendapatkan token dengan mengambil dari token
 	//Login email dan password lalu send lewat body dengan POST

@@ -1,6 +1,7 @@
 package kost
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gosimple/slug"
@@ -10,6 +11,7 @@ type Service interface {
 	GetKosts(userID int) ([]Kost, error)
 	GetKostByID(input GetKostDetailInput) (Kost, error)
 	CreateKost(input CreateKostInput) (Kost, error)
+	UpdateKost(inputID GetKostDetailInput, inputData CreateKostInput) (Kost, error)
 }
 
 type service struct {
@@ -77,4 +79,30 @@ func (s *service) CreateKost(input CreateKostInput) (Kost, error) {
 	}
 
 	return newKost, nil
+}
+
+func (s *service) UpdateKost(inputID GetKostDetailInput, inputData CreateKostInput) (Kost, error) {
+	kost, err := s.repository.FindByID(inputID.ID)
+	if err != nil {
+		return kost, err
+	}
+
+	//Check user yang memiliki kost
+	//nanti tambahin role
+	if kost.UserID != inputData.User.ID {
+		return kost, errors.New("Not an owner of Kost")
+	}
+
+	kost.Name = inputData.Name
+	kost.ShortDescription = inputData.ShortDescription
+	kost.Description = inputData.Description
+	kost.Perks = inputData.Perks
+	kost.LiverCount = inputData.LiverCount
+
+	updatedKost, err := s.repository.Update(kost)
+	if err != nil {
+		return updatedKost, err
+	}
+
+	return updatedKost, nil
 }
