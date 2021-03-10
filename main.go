@@ -130,6 +130,7 @@ func main() {
 	api.GET("/kosts/:id", authMiddleware(authService, userService), kostHandler.CreateKost)
 	api.POST("/kosts", kostHandler.GetKosts)
 	api.PUT("/kosts/:id", authMiddleware(authService, userService), kostHandler.UpdateKost)
+	api.POST("/kost-images", authMiddleware(authService, userService), kostHandler.UploadImage)
 
 	//Cara mendapatkan token dengan mengambil dari token
 	//Login email dan password lalu send lewat body dengan POST

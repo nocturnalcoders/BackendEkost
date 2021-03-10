@@ -75,8 +75,8 @@ type KostUserFormatter struct {
 }
 
 type KostImageFormatter struct {
-	ImageURL string `json:"images_url"`
-	IsPrmary bool   `json:"is_primary"`
+	ImageURL  string `json:"images_url"`
+	IsPrimary bool   `json:"is_primary"`
 }
 
 func FormatKostDetail(kost Kost) KostDetailFormatter {
@@ -119,12 +119,12 @@ func FormatKostDetail(kost Kost) KostDetailFormatter {
 		kostImageFormatter := KostImageFormatter{}
 		kostImageFormatter.ImageURL = image.FileName
 
-		isPrimary := false
+		IsPrimary := false
 
 		if image.IsPrimary == 1 {
-			isPrimary = true
+			IsPrimary = true
 		}
-		kostImageFormatter.IsPrmary = isPrimary
+		kostImageFormatter.IsPrimary = IsPrimary
 
 		images = append(images, kostImageFormatter)
 	}

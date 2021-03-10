@@ -10,6 +10,8 @@ type Repository interface {
 	FindByID(ID int) (Kost, error)
 	Save(kost Kost) (Kost, error)
 	Update(kost Kost) (Kost, error)
+	CreateImage(kostImage KostImage) (KostImage, error)
+	MarkAllImagesAsNonPrimary(kostID int) (bool, error)
 }
 
 type repository struct {
@@ -78,4 +80,26 @@ func (r *repository) Update(kost Kost) (Kost, error) {
 	}
 
 	return kost, nil
+}
+
+func (r *repository) CreateImage(kostImage KostImage) (KostImage, error) {
+	err := r.db.Create(&kostImage).Error
+	if err != nil {
+		return kostImage, err
+	}
+
+	return kostImage, nil
+}
+
+func (r *repository) MarkAllImagesAsNonPrimary(kostID int) (bool, error) {
+	//querynya
+	//UPDATE kost_images SET is_primary = false WHERE kostID = 1
+	//Query Gorm
+	err := r.db.Model(&KostImage{}).Where("kost_id = ?", kostID).Update("is_primary", false).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

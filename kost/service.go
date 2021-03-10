@@ -12,6 +12,7 @@ type Service interface {
 	GetKostByID(input GetKostDetailInput) (Kost, error)
 	CreateKost(input CreateKostInput) (Kost, error)
 	UpdateKost(inputID GetKostDetailInput, inputData CreateKostInput) (Kost, error)
+	SaveKostImage(input CreateKostImageInput, fileLocation string) (KostImage, error)
 }
 
 type service struct {
@@ -105,4 +106,37 @@ func (s *service) UpdateKost(inputID GetKostDetailInput, inputData CreateKostInp
 	}
 
 	return updatedKost, nil
+}
+
+func (s *service) SaveKostImage(input CreateKostImageInput, fileLocation string) (KostImage, error) {
+	kost, err := s.repository.FindByID(input.KostID)
+	if err != nil {
+		return KostImage{}, err
+	}
+
+	if kost.UserID != input.User.ID {
+		return KostImage{}, errors.New("Not an owner of Kost")
+	}
+
+	IsPrimary := 0
+	if input.IsPrimary {
+		IsPrimary = 1
+
+		_, err := s.repository.MarkAllImagesAsNonPrimary(input.KostID)
+		if err != nil {
+			return KostImage{}, err
+		}
+	}
+
+	kostImage := KostImage{}
+	kostImage.KostID = input.KostID
+	kostImage.IsPrimary = IsPrimary
+	kostImage.FileName = fileLocation
+
+	newKostImage, err := s.repository.CreateImage(kostImage)
+	if err != nil {
+		return newKostImage, err
+	}
+
+	return newKostImage, nil
 }

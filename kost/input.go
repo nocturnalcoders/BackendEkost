@@ -21,3 +21,9 @@ type CreateKostInput struct {
 	User user.User
 	//User akan diambil untuk pembuatan slug
 }
+
+type CreateKostImageInput struct {
+	KostID    int  `form:"kost_id" binding:"required"`
+	IsPrimary bool `form:"is_primary"`
+	User      user.User
+}

@@ -4,6 +4,7 @@ import (
 	"backendEkost/helper"
 	"backendEkost/kost"
 	"backendEkost/user"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -142,6 +143,60 @@ func (h *kostHandler) UpdateKost(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *kostHandler) UploadImage(c *gin.Context) {
+	var input kost.CreateKostImageInput
+
+	err := c.ShouldBind(&input)
+
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed To Upload Kost Image", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+	userID := currentUser.ID
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+
+		response := helper.APIResponse("Failed to Upload Kost Image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to Upload Kost Image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	_, err = h.service.SaveKostImage(input, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to Upload Kost Image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{"is_uploaded": true}
+	response := helper.APIResponse("Kost Image Successfuly Uploaded", http.StatusOK, "success", data)
+
+	c.JSON(http.StatusOK, response)
+}
+
 //User mengisi form
 //Tangkap parameter dari user ke input struct
 //ambil current user dari JWT/Handler
@@ -156,3 +211,13 @@ func (h *kostHandler) UpdateKost(c *gin.Context) {
 //4. Mapping dari input ke input struct (Ada 2 1. dari user, dan 1 dari uri)
 //5. Handler
 //6. User masukan input
+
+//Upload Images
+//Hanlder :
+//Tangkap input dan ubah ke struct input
+//save image kost ke suatu folder
+//service  (Kondisi memanggil point 2 di repo, panggil repo point 1)
+//Repository :
+//1. Create images/save data image ke dalam table kost_images
+//2. ubah is_primary true ke false
+//nomor 2 maksudnya adalah : saat user upload gambar, dia akan bisa masukan gambar untuk primary atau tidak .. kareana 1 kost, hanya perlu 1 gambar yang primary ..
