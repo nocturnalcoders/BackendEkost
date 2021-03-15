@@ -5,6 +5,7 @@ import (
 	"backendEkost/handler"
 	"backendEkost/helper"
 	"backendEkost/kost"
+	"backendEkost/transaction"
 	"backendEkost/user"
 	"log"
 	"net/http"
@@ -26,6 +27,7 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	kostRepository := kost.NewRepository(db)
+	transactionRepository := transaction.NewRepository(db)
 
 	// kosts, err := kostRepository.FindAll()
 	// kosts, err := kostRepository.FindByUserID(1)
@@ -47,6 +49,7 @@ func main() {
 	userService := user.NewService(userRepository)
 	kostService := kost.NewService(kostRepository)
 	authService := auth.NewService()
+	transactionService := transaction.NewService(transactionRepository, kostRepository)
 
 	// input := kost.CreateKostInput{}
 	// input.Name = "Kost Bu OONG MANTEPPP BEUTT"
@@ -68,8 +71,9 @@ func main() {
 	// kosts, _ := kostService.FindKosts(2)
 	// fmt.Println(len(kosts))
 
+	userHandler := handler.NewUserHandler(userService, authService)
 	kostHandler := handler.NewKostHandler(kostService)
-
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 	//Test Validasi Token
 	// // token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2fQ.ErbRHHI-DYqCEwjmRfuBa60a40Slygl7jnXYi0Uq3bg")
 	// // if err != nil {
@@ -113,8 +117,6 @@ func main() {
 	// 	fmt.Println(userByEmail.Name)
 	// }
 
-	userHandler := handler.NewUserHandler(userService, authService)
-
 	router := gin.Default()
 	router.Static("/images", "./images") // "./images" -> nama folder , "/images" -> akses folder
 	api := router.Group("/api/v1")       //API Versioning
@@ -131,7 +133,7 @@ func main() {
 	api.POST("/kosts", kostHandler.GetKosts)
 	api.PUT("/kosts/:id", authMiddleware(authService, userService), kostHandler.UpdateKost)
 	api.POST("/kost-images", authMiddleware(authService, userService), kostHandler.UploadImage)
-
+	api.GET("/kosts/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetKostTransactions)
 	//Cara mendapatkan token dengan mengambil dari token
 	//Login email dan password lalu send lewat body dengan POST
 
