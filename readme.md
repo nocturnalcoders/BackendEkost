@@ -18,9 +18,9 @@ Kebutuhan Entity DB
         * short_description : varchar
         * description : text
         * goal_amount : int //livecount
-        * current_amount : int //spacecount
+        * current_amount : int //currentspacecount
         * perks : text
-        * backer_count : text
+        * backer_count : text //spacecount
         * slug : varchar
         * created_at : datetime
         * updated_at : datetime

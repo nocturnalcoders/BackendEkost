@@ -5,6 +5,7 @@ import (
 	"backendEkost/handler"
 	"backendEkost/helper"
 	"backendEkost/kost"
+	"backendEkost/payment"
 	"backendEkost/transaction"
 	"backendEkost/user"
 	"log"
@@ -12,14 +13,18 @@ import (
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func main() {
-	dsn := "root:@tcp(127.0.0.1:3306)/ekostdb?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// dsn := "root:@tcp(127.0.0.1:3306)/ekostdb?charset=utf8mb4&parseTime=True&loc=Local"
+	// db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	dsn := "host=localhost user=postgres password=100299 dbname=ekostdb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -49,7 +54,17 @@ func main() {
 	userService := user.NewService(userRepository)
 	kostService := kost.NewService(kostRepository)
 	authService := auth.NewService()
-	transactionService := transaction.NewService(transactionRepository, kostRepository)
+	paymentService := payment.NewService()
+	transactionService := transaction.NewService(transactionRepository, kostRepository, paymentService)
+
+	user, _ := userService.GetUserByID(1)
+
+	input := transaction.CreateTransactionInput{
+		KostID: 1,
+		Amount: 5000000,
+		User:   user,
+	}
+	transactionService.CreateTransaction(input)
 
 	// input := kost.CreateKostInput{}
 	// input.Name = "Kost Bu OONG MANTEPPP BEUTT"
@@ -118,6 +133,7 @@ func main() {
 	// }
 
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.Static("/images", "./images") // "./images" -> nama folder , "/images" -> akses folder
 	api := router.Group("/api/v1")       //API Versioning
 
@@ -128,6 +144,8 @@ func main() {
 	//authMiddleware kita mempassing middlewarenya
 	//authMiddleware() brati yang dipassing nilai kembalian dari eksekui authMiddleware
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+	api.GET("/users/fetch", authMiddleware(authService, userService), userHandler.FetchUser)
+
 	api.GET("/kosts", kostHandler.GetKosts)
 	api.GET("/kosts/:id", authMiddleware(authService, userService), kostHandler.CreateKost)
 	api.POST("/kosts", kostHandler.GetKosts)
@@ -135,6 +153,8 @@ func main() {
 	api.POST("/kost-images", authMiddleware(authService, userService), kostHandler.UploadImage)
 	api.GET("/kosts/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetKostTransactions)
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransactions)
+	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
+	api.POST("/transactions/notification", transactionHandler.GetNotification)
 	//Cara mendapatkan token dengan mengambil dari token
 	//Login email dan password lalu send lewat body dengan POST
 

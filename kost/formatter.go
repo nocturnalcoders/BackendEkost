@@ -55,18 +55,19 @@ func FormatKosts(kosts []Kost) []KostFormatter {
 }
 
 type KostDetailFormatter struct {
-	ID               int                  `json:"id"`
-	Name             string               `json:"name"`
-	ShortDescription string               `json:"short_description"`
-	Description      string               `json:"description"`
-	ImageURL         string               `json:"images_url"`
-	LiverCount       int                  `json:"liver_count"`
-	SpaceCount       int                  `json:"space_count"`
-	UserID           int                  `json:"user_id"`
-	Slug             string               `json:"slug"`
-	Perks            []string             `json:"perks"`
-	User             KostUserFormatter    `json:"user"`
-	Images           []KostImageFormatter `json:"images"`
+	ID                int                  `json:"id"`
+	Name              string               `json:"name"`
+	ShortDescription  string               `json:"short_description"`
+	Description       string               `json:"description"`
+	ImageURL          string               `json:"images_url"`
+	CurrentSpaceCount int                  `json:"current_space_count"`
+	LiverCount        int                  `json:"liver_count"`
+	SpaceCount        int                  `json:"space_count"`
+	UserID            int                  `json:"user_id"`
+	Slug              string               `json:"slug"`
+	Perks             []string             `json:"perks"`
+	User              KostUserFormatter    `json:"user"`
+	Images            []KostImageFormatter `json:"images"`
 }
 
 type KostUserFormatter struct {
@@ -85,6 +86,7 @@ func FormatKostDetail(kost Kost) KostDetailFormatter {
 	kostDetailFormatter.Name = kost.Name
 	kostDetailFormatter.ShortDescription = kost.ShortDescription
 	kostDetailFormatter.Description = kost.Description
+	kostDetailFormatter.CurrentSpaceCount = kost.CurrentSpaceCount
 	kostDetailFormatter.LiverCount = kost.LiverCount
 	kostDetailFormatter.SpaceCount = kost.SpaceCount
 	kostDetailFormatter.UserID = kost.UserID

@@ -7,14 +7,15 @@ import (
 )
 
 type Transaction struct {
-	ID        int
-	KostID    int
-	UserID    int
-	Amount    int
-	Status    string
-	Code      string
-	User      user.User
-	Kost      kost.Kost
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID         int
+	KostID     int
+	UserID     int
+	Amount     int
+	Status     string
+	Code       string
+	PaymentURL string
+	User       user.User
+	Kost       kost.Kost
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
