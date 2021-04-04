@@ -60,14 +60,14 @@ func main() {
 	paymentService := payment.NewService()
 	transactionService := transaction.NewService(transactionRepository, kostRepository, paymentService)
 
-	user, _ := userService.GetUserByID(1)
+	// user, _ := userService.GetUserByID(1)
 
 	// input := transaction.CreateTransactionInput{
 	// 	KostID: 1,
 	// 	Amount: 5000000,
 	// 	User:   user,
 	// }
-	transactionService.CreateTransaction(input)
+	// transactionService.CreateTransaction(input)
 
 	// input := kost.CreateKostInput{}
 	// input.Name = "Kost Bu OONG MANTEPPP BEUTT"
